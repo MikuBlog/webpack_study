@@ -187,26 +187,34 @@ module.exports = {
 					{
 						// 处理图片资源
 						// 问题：处理不了html中的图片
-						test: /\.(jpg|png|gif)$/,
+						test: /\.(jpe?g|png|gif|svg)$/,
 						// 只使用一个loader就可以不需要使用use
-						// 下载: url-loader file-loader
-						loader: 'url-loader',
-						options: {
-							// 图片大小小于8kb，就会被base64处理
-							// 优点：减少请求数量（减轻服务器压力）
-							// 缺点：图片体积会更大（文件请求速度更慢）
-							limit: 8 * 1024,
-							// 问题：因为url-loader默认使用es6模块解析，而html-loader引入图片是commonjs
-							// 解析时会出问题：[object module]
-							// 解决：关闭url-loader的es6模块，使用commonjs解析
-							esModule: false,
-							// 给图片进行重命名
-							// [hash:10]取图片的hash的前10位
-							// [ext]取文件原来的扩展名
-							name: '[hash:10].[ext]',
-							// 输出路径
-							outputPath: 'image'
-						}
+						use: [
+							{
+								// 下载: url-loader file-loader
+								loader: 'url-loader',
+								options: {
+									// 图片大小小于8kb，就会被base64处理
+									// 优点：减少请求数量（减轻服务器压力）
+									// 缺点：图片体积会更大（文件请求速度更慢）
+									limit: 8 * 1024,
+									// 问题：因为url-loader默认使用es6模块解析，而html-loader引入图片是commonjs
+									// 解析时会出问题：[object module]
+									// 解决：关闭url-loader的es6模块，使用commonjs解析
+									esModule: false,
+									// 给图片进行重命名
+									// [hash:10]取图片的hash的前10位
+									// [ext]取文件原来的扩展名
+									name: '[hash:10].[ext]',
+									// 输出路径
+									outputPath: 'image'
+								},
+							},
+							/**
+							 * 图片压缩，一定要放到图片生成之前
+							 */
+							'image-webpack-loader'
+						]
 					},
 					{
 						// 打包其他资源
@@ -338,7 +346,7 @@ module.exports = {
 		// 端口号
 		port: 3000,
 		// 域名
-		host:'localhost',
+		host: 'localhost',
 		// 不显示启动服务器的日志信息
 		clientLogLevel: 'none',
 		// 除了一些基本启动信息以外，其他内容都不要显示
